@@ -48,12 +48,21 @@ void AFPSBlackHole::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// Finds all overlapping componenets that can collide and maybe physically simulating.
+	// Finds all overlapping components that can collide and maybe physically simulating.
 	TArray<UPrimitiveComponent*> OverlappingComps;
-	OuterSphereComp->GetOverlappingActors(OverlappingComps);
+	OuterSphereComp->GetOverlappingComponents(OverlappingComps);
 
 	for (int32 i = 0; i < OverlappingComps.Num(); i++)
 	{
-			
+		UPrimitiveComponent* PrimComp = OverlappingComps[i];
+		if (PrimComp && PrimComp->IsSimulatingPhysics())
+		{
+			// the component we are looking for! It needs to be simulating in order to apply forces.
+
+			const float SphereRadius = OuterSphereComp->GetScaledSphereRadius();
+			const float ForceStrength = -2000.f; // Negative value to make it pull towards the origin instead of pushing away
+
+			PrimComp->AddRadialForce(GetActorLocation(), SphereRadius, ForceStrength, RIF_Constant, true);
+		}
 	}	
 }
