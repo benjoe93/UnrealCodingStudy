@@ -11,6 +11,11 @@ class AFPSGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
+protected:
+
+	UPROPERTY(EditDefaultsOnly, Category = "Spactating")
+	TSubclassOf<AActor>SpectatingViewpointClass;
+
 public:
 
 	AFPSGameMode();
