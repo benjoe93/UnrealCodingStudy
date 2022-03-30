@@ -22,7 +22,7 @@ AFPSExtractionZone::AFPSExtractionZone()
 
 	OverlapComp->SetHiddenInGame(false);
 	
-	OverlapComp->OnComponentBeginOverlap.AddDynamic(this, &AFPSExtractionZone::HandleOVerlap);
+	OverlapComp->OnComponentBeginOverlap.AddDynamic(this, &AFPSExtractionZone::HandleOverlap);
 
 	DecalComp = CreateDefaultSubobject<UDecalComponent>(TEXT("Decal"));
 	DecalComp->DecalSize = FVector(200.f);
@@ -30,7 +30,7 @@ AFPSExtractionZone::AFPSExtractionZone()
 }
 
 
-void AFPSExtractionZone::HandleOVerlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AFPSExtractionZone::HandleOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	AFPSCharacter* MyPawn = Cast<AFPSCharacter>(OtherActor);
 	if (MyPawn == nullptr)
