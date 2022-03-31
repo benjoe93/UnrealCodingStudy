@@ -28,11 +28,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	UStaticMeshComponent* Arrow;
 
-	UPROPERTY(EditAnywhere, Category = "Launch")
-	float ForwardVelocity = 1500.f;
+	UPROPERTY(EditInstanceOnly, Category = "Launch")
+	float LaunchStrength;
 
-	UPROPERTY(EditAnywhere, Category = "Launch")
-	float UpwardVelocity = 1000.f;
+	UPROPERTY(EditInstanceOnly, Category = "Launch")
+	float LaunchAngle;
+
+	UPROPERTY(EditDefaultsOnly, Category = "FX")
+	UParticleSystem* LaunchFX;
 	
 	UFUNCTION()
 	void HandleOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

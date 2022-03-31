@@ -5,6 +5,7 @@
 
 #include "FPSCharacter.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AFPSLaunchPad::AFPSLaunchPad()
@@ -14,10 +15,7 @@ AFPSLaunchPad::AFPSLaunchPad()
 
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
 	RootComponent = BoxCollision;
-	BoxCollision->SetBoxExtent(FVector(200.f));
-	BoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	BoxCollision->SetCollisionResponseToAllChannels(ECR_Ignore);
-	BoxCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	BoxCollision->SetBoxExtent(FVector(75.f));
 
 	BoxCollision->OnComponentBeginOverlap.AddDynamic(this, &AFPSLaunchPad::HandleOverlap);
 	
@@ -29,18 +27,36 @@ AFPSLaunchPad::AFPSLaunchPad()
 	Arrow = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Arrow"));
 	Arrow->SetupAttachment(BoxCollision);
 	Arrow->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	LaunchStrength = 1500.f;
+	LaunchAngle = 35.f;
+	
 }
 
 void AFPSLaunchPad::HandleOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Launch!"));
+	// Make rotator
+	FRotator LaunchDirection = GetActorRotation();
+	LaunchDirection.Pitch +=LaunchAngle;
+	FVector LaunchVelocity = LaunchDirection.Vector() * LaunchStrength;
+
 	AFPSCharacter* MyPawn = Cast<AFPSCharacter>(OtherActor);
-
-	if (MyPawn == nullptr)
+	if (MyPawn)
 	{
-		return;
-	}
+		// Launch Player!
+		MyPawn->LaunchCharacter(LaunchVelocity, true, true);
 
-	MyPawn->LaunchCharacter(FVector(ForwardVelocity, 0.f, UpwardVelocity), false, false);
+		// Spawn FX
+		UGameplayStatics::SpawnEmitterAtLocation(this, LaunchFX, GetActorLocation());
+	}
+	else if (OtherComp && OtherComp->IsSimulatingPhysics())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Cube!"))
+		// Launch Box
+		OtherComp->AddImpulse(LaunchVelocity, NAME_None, true);
+
+		// Spawn FX
+		UGameplayStatics::SpawnEmitterAtLocation(this, LaunchFX, GetActorLocation());
+	}
 }
